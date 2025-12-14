@@ -1,0 +1,61 @@
+services:
+  laravel-app:
+    build:
+      context: ./laravel-app
+      dockerfile: Dockerfile
+    container_name: laravel_app
+    depends_on:
+      - laravel-db
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./laravel-app/src:/var/www/html
+    environment:
+      DB_HOST: laravel-db
+      DB_DATABASE: laravel
+      DB_USERNAME: admin
+      DB_PASSWORD: qwertyui
+      APP_URL: http://localhost:8000 
+    command: sh -c "composer install && php artisan migrate && php artisan serve --host=0.0.0.0 --port=8000"
+    networks:
+      - db
+      - backend
+
+  laravel-db:
+    image: mysql:8.0
+    container_name: laravel_db
+    restart: always
+    environment:
+      MYSQL_DATABASE: laravel
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: qwertyui
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - db
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: phpmyadmin
+    restart: always
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: laravel-db
+      PMA_PORT: 3306
+      PMA_USER: admin
+      PMA_PASSWORD: qwertyui
+      UPLOAD_LIMIT: 300M
+    networks:
+      - db
+    depends_on:
+      - laravel-db
+
+volumes:
+  db_data:
+
+networks:
+  db:
+    driver: bridge
+  backend:
+    driver: bridge
