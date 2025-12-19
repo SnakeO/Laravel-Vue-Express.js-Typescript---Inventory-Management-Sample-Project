@@ -1,0 +1,62 @@
+{
+  "compilerOptions": {
+    // Compile to ES2022 JavaScript, supporting modern features like top-level await
+    "target": "ES2022",
+
+    // Base directory for resolving non-relative module names (required for paths)
+    "baseUrl": ".",
+
+    // Path aliases matching package.json "imports" for Node.js subpath imports
+    // These enable TypeScript to resolve #alias imports for type checking and IDE support
+    "paths": {
+      "#config/*": ["./src/config/*"],
+      "#common/*": ["./src/common/*"],
+      "#modules/*": ["./src/modules/*"]
+    },
+
+    // Use Node.js ESM module system (supports .js extensions in imports)
+    "module": "NodeNext",
+
+    // Resolve modules using Node.js ESM algorithm (required for NodeNext module)
+    "moduleResolution": "NodeNext",
+
+    // Output compiled JavaScript files to the dist/ directory
+    "outDir": "./dist",
+
+    // Source files are located in the src/ directory
+    "rootDir": "./src",
+
+    // Enable all strict type-checking options for maximum type safety
+    "strict": true,
+
+    // Allow default imports from modules with no default export
+    "esModuleInterop": true,
+
+    // Skip type checking of declaration files for faster compilation
+    "skipLibCheck": true,
+
+    // Ensure consistent casing in file imports (prevents issues on case-sensitive file systems)
+    "forceConsistentCasingInFileNames": true,
+
+    // Allow importing JSON files as modules
+    "resolveJsonModule": true,
+
+    // Generate .d.ts type declaration files for library consumers
+    "declaration": true,
+
+    // Generate sourcemaps for declaration files (enables "go to definition" in IDEs)
+    "declarationMap": true,
+
+    // Generate sourcemaps for debugging compiled JavaScript
+    "sourceMap": true,
+
+    // Ensure each file can be safely transpiled independently (required for ts-jest ESM support)
+    "isolatedModules": true
+  },
+
+  // Include all TypeScript files in src/ directory
+  "include": ["src/**/*"],
+
+  // Exclude dependencies, build output, and test files from compilation
+  "exclude": ["node_modules", "dist", "**/*.test.ts"]
+}
