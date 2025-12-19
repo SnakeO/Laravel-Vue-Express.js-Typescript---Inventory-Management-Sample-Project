@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    'express' => [
+        'url' => env('EXPRESS_API_URL'),
+        'webhook_secret' => env('EXPRESS_WEBHOOK_SECRET', 'change-me-in-production'),
+    ],
+
 ];

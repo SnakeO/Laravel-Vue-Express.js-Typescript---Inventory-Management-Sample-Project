@@ -33,6 +33,9 @@ jest.unstable_mockModule('#config/index.js', () => ({
     apiUrl: 'http://localhost:8000/api/v1',
     timeout: 5000,
   },
+  webhookConfig: {
+    secret: 'test-webhook-secret',
+  },
 }))
 
 describe('Cache Controller', () => {
