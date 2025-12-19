@@ -1,0 +1,22 @@
+<?php
+
+namespace App\Http\Requests\Order;
+
+use App\Rules\SufficientStock;
+use Illuminate\Foundation\Http\FormRequest;
+
+class StoreOrderRequest extends FormRequest
+{
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    public function rules(): array
+    {
+        return [
+            'product_id' => ['required', 'exists:products,id'],
+            'quantity' => ['required', 'integer', 'min:1', new SufficientStock],
+        ];
+    }
+}

@@ -1,4 +1,44 @@
 services:
+  express-api:
+    build:
+      context: ./express-api
+      dockerfile: Dockerfile
+    container_name: express_api
+    depends_on:
+      - redis
+      - laravel-app
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./express-api/src:/app
+    environment:
+      - NODE_ENV=development
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - LARAVEL_API_URL=http://laravel-app:8000/api/v1
+      - CACHE_TTL=300
+    command: sh -c "npm install && npm run dev"
+    stdin_open: true
+    tty: true
+    networks:
+      - backend
+      - cache
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+    environment:
+      - NODE_ENV=development
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    stdin_open: true
+    tty: true
+
   laravel-app:
     build:
       context: ./laravel-app
@@ -6,6 +46,7 @@ services:
     container_name: laravel_app
     depends_on:
       - laravel-db
+      - redis
     ports:
       - "8000:8000"
     volumes:
@@ -15,11 +56,14 @@ services:
       DB_DATABASE: laravel
       DB_USERNAME: admin
       DB_PASSWORD: qwertyui
-      APP_URL: http://localhost:8000 
+      APP_URL: http://localhost:8000
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
     command: sh -c "composer install && php artisan migrate && php artisan serve --host=0.0.0.0 --port=8000"
     networks:
       - db
       - backend
+      - cache
 
   laravel-db:
     image: mysql:8.0
@@ -51,10 +95,24 @@ services:
     depends_on:
       - laravel-db
 
+  redis:
+    image: redis:7.0.4
+    container_name: redis
+    restart: always
+    ports:
+      - "6379:6379"
+    networks:
+      - cache
+    volumes:
+      - redis_data:/data
+
 volumes:
   db_data:
+  redis_data:
 
 networks:
+  cache:
+    driver: bridge
   db:
     driver: bridge
   backend:
