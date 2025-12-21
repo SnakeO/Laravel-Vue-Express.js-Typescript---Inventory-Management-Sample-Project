@@ -4,6 +4,4 @@
   </v-container>
 </template>
 
-<script setup>
-import { OrdersTable } from '@/modules/orders'
-</script>
+<script setup></script>

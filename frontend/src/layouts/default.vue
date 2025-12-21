@@ -42,7 +42,6 @@
 
 <script setup>
 import { ref } from 'vue'
-import AppSnackbar from '@/shared/components/AppSnackbar.vue'
 
 const drawer = ref(true)
 </script>

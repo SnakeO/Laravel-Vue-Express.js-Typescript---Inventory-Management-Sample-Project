@@ -97,7 +97,6 @@
   import { onMounted, ref } from 'vue'
   import { useProducts } from '../composables/useProducts'
   import { useProductsStore } from '../stores/products'
-  import ProductDialog from './ProductDialog.vue'
 
   const { products, loading, fetchProducts, deleteProduct } = useProducts()
   const productsStore = useProductsStore()

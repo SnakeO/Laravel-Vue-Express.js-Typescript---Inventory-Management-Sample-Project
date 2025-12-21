@@ -67,7 +67,6 @@
 import { ref, onMounted } from 'vue'
 import { useOrders } from '../composables/useOrders'
 import { useOrdersStore } from '../stores/orders'
-import OrderDialog from './OrderDialog.vue'
 
 const { orders, loading, fetchOrders, deleteOrder } = useOrders()
 const ordersStore = useOrdersStore()
