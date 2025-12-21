@@ -44,6 +44,17 @@
           />
 
           <v-text-field
+            v-model.number="form.cost"
+            class="mb-2"
+            label="Cost"
+            min="0"
+            prefix="$"
+            :rules="[rules.required, rules.positive]"
+            step="0.01"
+            type="number"
+          />
+
+          <v-text-field
             v-model.number="form.quantity"
             label="Quantity"
             min="0"
@@ -89,6 +100,7 @@
     description: '',
     category: '',
     price: null,
+    cost: null,
     quantity: 0,
   })
 
@@ -97,6 +109,7 @@
     form.description = ''
     form.category = ''
     form.price = null
+    form.cost = null
     form.quantity = 0
     formRef.value?.resetValidation()
   }
