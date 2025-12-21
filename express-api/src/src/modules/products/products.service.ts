@@ -4,7 +4,7 @@
 import { redis } from '#common/services/redis.js'
 import { laravelClient } from '#common/services/laravel.js'
 import { redisConfig } from '#config/index.js'
-import type { Product, ProductWithoutCost, ProductFilters } from './products.types.js'
+import type { Product, ProductWithoutCost, ProductFilters, PaginatedProducts, PaginationMeta } from './products.types.js'
 import { stripCost, stripCostFromList } from './products.types.js'
 import type { ApiResponse, PaginatedResponse } from '#common/types/api.js'
 
@@ -20,24 +20,28 @@ export const buildCacheKey = (filters: ProductFilters): string => {
     parts.push(`name:${filters.name}`)
   }
 
-  return parts.length === 1 ? `${CACHE_PREFIX}:all` : parts.join(':')
+  const page = filters.page ?? 1
+  const perPage = filters.per_page ?? 20
+  parts.push(`page:${page}:${perPage}`)
+
+  return parts.join(':')
 }
 
 export const getFromCache = async (
   key: string
-): Promise<ProductWithoutCost[] | null> => {
+): Promise<PaginatedProducts | null> => {
   const cached = await redis.get(key)
   if (cached) {
-    return JSON.parse(cached) as ProductWithoutCost[]
+    return JSON.parse(cached) as PaginatedProducts
   }
   return null
 }
 
 export const setCache = async (
   key: string,
-  products: ProductWithoutCost[]
+  result: PaginatedProducts
 ): Promise<void> => {
-  await redis.set(key, JSON.stringify(products), 'EX', redisConfig.cacheTtl)
+  await redis.set(key, JSON.stringify(result), 'EX', redisConfig.cacheTtl)
 }
 
 export const invalidateAllProductCache = async (): Promise<void> => {
@@ -50,7 +54,7 @@ export const invalidateAllProductCache = async (): Promise<void> => {
 
 export const getProducts = async (
   filters: ProductFilters
-): Promise<ProductWithoutCost[]> => {
+): Promise<PaginatedProducts> => {
   const cacheKey = buildCacheKey(filters)
 
   // Check cache first
@@ -62,26 +66,29 @@ export const getProducts = async (
 
   console.log(`Cache miss for ${cacheKey}`)
 
-  // Build query params
-  const params = new URLSearchParams()
-  if (filters.category) {
-     params.append('category', filters.category)
-  }
-
-  if (filters.name) {
-      params.append('name', filters.name)
-  }
-
-  const response = await laravelClient.get<PaginatedResponse<Product>>(
-    `/products?${params}`
+  const params = Object.fromEntries(
+    Object.entries(filters).filter(([, v]) => v != null)
   )
 
-  const products = stripCostFromList(response.data.data)
+  const response = await laravelClient.get<PaginatedResponse<Product>>(
+    '/products',
+    { params }
+  )
+
+  const result: PaginatedProducts = {
+    data: stripCostFromList(response.data.data),
+    meta: {
+      current_page: response.data.meta.current_page,
+      last_page: response.data.meta.last_page,
+      per_page: response.data.meta.per_page,
+      total: response.data.meta.total,
+    },
+  }
 
   // Cache the result
-  await setCache(cacheKey, products)
+  await setCache(cacheKey, result)
 
-  return products
+  return result
 }
 
 export const getProduct = async (id: number): Promise<ProductWithoutCost> => {

@@ -3,16 +3,22 @@
  */
 import type { Request, Response, NextFunction } from 'express'
 import * as orderService from './orders.service.js'
+import type { OrderFilters } from './orders.types.js'
 
 export const list = async (
-  _req: Request,
+  req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
   try {
-    const orders = await orderService.getOrders()
+    const filters: OrderFilters = {
+      page: req.query.page ? Number(req.query.page) : undefined,
+      per_page: req.query.per_page ? Number(req.query.per_page) : undefined,
+    }
 
-    res.json({ data: orders })
+    const result = await orderService.getOrders(filters)
+
+    res.json(result)
   } catch (error) {
     next(error)
   }

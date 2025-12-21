@@ -14,11 +14,13 @@ export const list = async (
     const filters: ProductFilters = {
       category: req.query.category as string | undefined,
       name: req.query.name as string | undefined,
+      page: req.query.page ? Number(req.query.page) : undefined,
+      per_page: req.query.per_page ? Number(req.query.per_page) : undefined,
     }
 
-    const products = await productService.getProducts(filters)
+    const result = await productService.getProducts(filters)
 
-    res.json({ data: products })
+    res.json(result)
   } catch (error) {
     next(error)
   }

@@ -15,6 +15,20 @@ export type ProductWithoutCost = Omit<Product, 'cost'>
 export interface ProductFilters {
   category?: string
   name?: string
+  page?: number
+  per_page?: number
+}
+
+export interface PaginationMeta {
+  current_page: number
+  last_page: number
+  per_page: number
+  total: number
+}
+
+export interface PaginatedProducts {
+  data: ProductWithoutCost[]
+  meta: PaginationMeta
 }
 
 /**

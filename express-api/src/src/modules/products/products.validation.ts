@@ -24,4 +24,6 @@ export const updateProductSchema = Joi.object({
 export const productFiltersSchema = Joi.object({
   category: Joi.string().max(100).optional(),
   name: Joi.string().max(255).optional(),
+  page: Joi.number().integer().min(1).optional(),
+  per_page: Joi.number().integer().min(1).max(100).optional(),
 })

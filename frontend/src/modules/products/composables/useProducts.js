@@ -9,6 +9,10 @@ export function useProducts () {
   const products = ref([])
   const loading = ref(false)
   const error = ref(null)
+  const totalItems = ref(0)
+  const currentPage = ref(1)
+  const lastPage = ref(1)
+  const itemsPerPage = ref(20)
 
   const appStore = useAppStore()
 
@@ -19,6 +23,12 @@ export function useProducts () {
     try {
       const response = await api.get('/products', { params: cleanParams(filters) })
       products.value = response.data.data
+      if (response.data.meta) {
+        totalItems.value = response.data.meta.total
+        currentPage.value = response.data.meta.current_page
+        lastPage.value = response.data.meta.last_page
+        itemsPerPage.value = response.data.meta.per_page
+      }
     } catch (error_) {
       const msg = error_.message
       error.value = msg
@@ -69,6 +79,10 @@ export function useProducts () {
     products,
     loading,
     error,
+    totalItems,
+    currentPage,
+    lastPage,
+    itemsPerPage,
     fetchProducts,
     createProduct,
     deleteProduct,

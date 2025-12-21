@@ -15,6 +15,7 @@ const app: Express = express()
 // Middleware
 app.use(express.json())
 app.use(cors())
+app.set('etag', false)
 
 // Health check
 app.get('/', (_req, res) => {

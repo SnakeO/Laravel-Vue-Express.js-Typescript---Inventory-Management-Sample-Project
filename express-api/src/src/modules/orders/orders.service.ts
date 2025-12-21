@@ -2,7 +2,7 @@
  * Orders service - business logic, Laravel API calls, strips cost from nested products
  */
 import { laravelClient } from '#common/services/laravel.js'
-import type { Order, CreateOrderDto } from './orders.types.js'
+import type { Order, CreateOrderDto, OrderFilters, PaginatedOrders } from './orders.types.js'
 import type { ApiResponse, PaginatedResponse } from '#common/types/api.js'
 import { stripCost } from '#modules/products/index.js'
 import type { Product } from '#modules/products/index.js'
@@ -18,12 +18,26 @@ const transformOrder = (order: Order & { product?: Product }): Order => {
   return order
 }
 
-export const getOrders = async (): Promise<Order[]> => {
+export const getOrders = async (filters: OrderFilters = {}): Promise<PaginatedOrders> => {
+  const params = Object.fromEntries(
+    Object.entries(filters).filter(([, v]) => v != null)
+  )
+
   const response =
     await laravelClient.get<PaginatedResponse<Order & { product?: Product }>>(
-      '/orders'
+      '/orders',
+      { params }
     )
-  return response.data.data.map(transformOrder)
+
+  return {
+    data: response.data.data.map(transformOrder),
+    meta: {
+      current_page: response.data.meta.current_page,
+      last_page: response.data.meta.last_page,
+      per_page: response.data.meta.per_page,
+      total: response.data.meta.total,
+    },
+  }
 }
 
 export const getOrder = async (id: number): Promise<Order> => {

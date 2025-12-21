@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Order\IndexOrderRequest;
 use App\Http\Requests\Order\StoreOrderRequest;
 use App\Http\Resources\OrderResource;
 use App\Models\Order;
@@ -11,9 +12,11 @@ use Symfony\Component\HttpFoundation\Response;
 
 class OrderController extends Controller
 {
-    public function index(): AnonymousResourceCollection
+    public function index(IndexOrderRequest $request): AnonymousResourceCollection
     {
-        $orders = Order::paginate(20);
+        $validated = $request->validated();
+        $perPage = $validated['per_page'] ?? 20;
+        $orders = Order::paginate($perPage);
 
         return OrderResource::collection($orders);
     }

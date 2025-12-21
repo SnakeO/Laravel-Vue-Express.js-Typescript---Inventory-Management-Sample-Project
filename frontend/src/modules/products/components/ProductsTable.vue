@@ -41,11 +41,15 @@
         </v-col>
       </v-row>
 
-      <v-data-table
+      <v-data-table-server
+        v-model:items-per-page="perPage"
+        v-model:page="page"
         :headers="headers"
         :items="products"
+        :items-length="totalItems"
         :loading="loading"
         :sort-by="productsStore.sortBy"
+        @update:options="handleTableOptions"
         @update:sort-by="productsStore.setSortBy"
       >
         <template #item.price="{ item }">
@@ -67,7 +71,7 @@
             <p class="text-grey">No products found</p>
           </div>
         </template>
-      </v-data-table>
+      </v-data-table-server>
     </v-card-text>
 
     <v-dialog v-model="deleteDialog" max-width="400">
@@ -94,15 +98,17 @@
 </template>
 
 <script setup>
-  import { onMounted, ref } from 'vue'
+  import { ref } from 'vue'
   import { useProducts } from '../composables/useProducts'
   import { useProductsStore } from '../stores/products'
 
-  const { products, loading, fetchProducts, deleteProduct } = useProducts()
+  const { products, loading, totalItems, fetchProducts, deleteProduct } = useProducts()
   const productsStore = useProductsStore()
 
   const deleteDialog = ref(false)
   const productToDelete = ref(null)
+  const page = ref(1)
+  const perPage = ref(20)
 
   const headers = [
     { title: 'Name', key: 'name', sortable: true },
@@ -113,21 +119,36 @@
     { title: 'Actions', key: 'actions', sortable: false, align: 'center' },
   ]
 
+  function buildParams () {
+    return {
+      ...productsStore.filters,
+      page: page.value,
+      per_page: perPage.value,
+    }
+  }
+
   let debounceTimer = null
   function debouncedFetch () {
     clearTimeout(debounceTimer)
     debounceTimer = setTimeout(() => {
-      fetchProducts(productsStore.filters)
+      page.value = 1
+      fetchProducts(buildParams())
     }, 300)
   }
 
   function clearFilters () {
     productsStore.clearFilters()
-    fetchProducts({})
+    page.value = 1
+    fetchProducts(buildParams())
   }
 
   function handleProductCreated () {
-    fetchProducts(productsStore.filters)
+    fetchProducts(buildParams())
+  }
+
+  // v-data-table-server fires @update:options on any pagination/sort change
+  function handleTableOptions () {
+    fetchProducts(buildParams())
   }
 
   function confirmDelete (product) {
@@ -142,8 +163,4 @@
       productToDelete.value = null
     }
   }
-
-  onMounted(() => {
-    fetchProducts(productsStore.filters)
-  })
 </script>

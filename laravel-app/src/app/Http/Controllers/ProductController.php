@@ -23,10 +23,11 @@ class ProductController extends Controller
         }
 
         if (!empty($validated['category'])) {
-            $query->where('category', $validated['category']);
+            $query->where('category', 'like', '%' . $validated['category'] . '%');
         }
 
-        $products = $query->paginate(20);
+        $perPage = $validated['per_page'] ?? 20;
+        $products = $query->paginate($perPage);
 
         return ProductResource::collection($products);
     }
