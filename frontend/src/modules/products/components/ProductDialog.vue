@@ -114,7 +114,7 @@
 
     loading.value = true
     try {
-      await createProduct({ ...form })
+      await createProduct(form)
       emit('created')
       handleClose()
     } catch {

@@ -27,7 +27,8 @@ api.interceptors.response.use(
 /**
  * Removes empty/null/undefined values from an object (for query params)
  */
-const cleanParams = (obj) =>
-  Object.fromEntries(Object.entries(obj).filter(([, v]) => v))
+function cleanParams (obj) {
+  return Object.fromEntries(Object.entries(obj).filter(([, v]) => v))
+}
 
 export { api, cleanParams }
