@@ -24,10 +24,10 @@
 
         <template #item.actions="{ item }">
           <v-btn
+            color="error"
             icon="mdi-delete"
             size="small"
             variant="text"
-            color="error"
             @click="confirmDelete(item)"
           />
         </template>
@@ -51,8 +51,8 @@
           <v-btn variant="text" @click="deleteDialog = false">Cancel</v-btn>
           <v-btn
             color="error"
-            variant="elevated"
             :loading="loading"
+            variant="elevated"
             @click="handleDelete"
           >
             Delete
@@ -64,46 +64,46 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useOrders } from '../composables/useOrders'
-import { useOrdersStore } from '../stores/orders'
+  import { onMounted, ref } from 'vue'
+  import { useOrders } from '../composables/useOrders'
+  import { useOrdersStore } from '../stores/orders'
 
-const { orders, loading, fetchOrders, deleteOrder } = useOrders()
-const ordersStore = useOrdersStore()
+  const { orders, loading, fetchOrders, deleteOrder } = useOrders()
+  const ordersStore = useOrdersStore()
 
-const deleteDialog = ref(false)
-const orderToDelete = ref(null)
+  const deleteDialog = ref(false)
+  const orderToDelete = ref(null)
 
-const headers = [
-  { title: 'ID', key: 'id', sortable: true },
-  { title: 'Product', key: 'product', sortable: false },
-  { title: 'Quantity', key: 'quantity', sortable: true },
-  { title: 'Created At', key: 'created_at', sortable: true },
-  { title: 'Actions', key: 'actions', sortable: false, align: 'center' },
-]
+  const headers = [
+    { title: 'ID', key: 'id', sortable: true },
+    { title: 'Product', key: 'product', sortable: false },
+    { title: 'Quantity', key: 'quantity', sortable: true },
+    { title: 'Created At', key: 'created_at', sortable: true },
+    { title: 'Actions', key: 'actions', sortable: false, align: 'center' },
+  ]
 
-function formatDate(dateString) {
-  return new Date(dateString).toLocaleString()
-}
-
-function handleOrderCreated() {
-  fetchOrders()
-}
-
-function confirmDelete(order) {
-  orderToDelete.value = order
-  deleteDialog.value = true
-}
-
-async function handleDelete() {
-  if (orderToDelete.value) {
-    await deleteOrder(orderToDelete.value.id)
-    deleteDialog.value = false
-    orderToDelete.value = null
+  function formatDate (dateString) {
+    return new Date(dateString).toLocaleString()
   }
-}
 
-onMounted(() => {
-  fetchOrders()
-})
+  function handleOrderCreated () {
+    fetchOrders()
+  }
+
+  function confirmDelete (order) {
+    orderToDelete.value = order
+    deleteDialog.value = true
+  }
+
+  async function handleDelete () {
+    if (orderToDelete.value) {
+      await deleteOrder(orderToDelete.value.id)
+      deleteDialog.value = false
+      orderToDelete.value = null
+    }
+  }
+
+  onMounted(() => {
+    fetchOrders()
+  })
 </script>

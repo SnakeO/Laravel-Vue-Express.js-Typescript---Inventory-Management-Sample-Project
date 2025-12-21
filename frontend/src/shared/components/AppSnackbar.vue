@@ -2,8 +2,8 @@
   <v-snackbar
     v-model="appStore.snackbar.show"
     :color="appStore.snackbar.color"
-    :timeout="appStore.snackbar.timeout"
     location="bottom right"
+    :timeout="appStore.snackbar.timeout"
   >
     {{ appStore.snackbar.message }}
 
@@ -16,7 +16,7 @@
 </template>
 
 <script setup>
-import { useAppStore } from '@/shared/stores/app'
+  import { useAppStore } from '@/shared/stores/app'
 
-const appStore = useAppStore()
+  const appStore = useAppStore()
 </script>

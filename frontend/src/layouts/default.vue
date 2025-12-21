@@ -2,14 +2,14 @@
   <v-app>
     <v-navigation-drawer v-model="drawer">
       <v-list-item
-        title="Inventory Manager"
-        subtitle="Product & Order Management"
         class="py-4"
+        subtitle="Product & Order Management"
+        title="Inventory Manager"
       />
 
       <v-divider />
 
-      <v-list nav density="compact">
+      <v-list density="compact" nav>
         <v-list-item
           prepend-icon="mdi-package-variant"
           title="Products"
@@ -41,7 +41,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+  import { ref } from 'vue'
 
-const drawer = ref(true)
+  const drawer = ref(true)
 </script>

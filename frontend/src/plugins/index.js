@@ -6,10 +6,10 @@
 
 import { createPinia } from 'pinia'
 import router from '@/router'
-
-const pinia = createPinia()
 // Plugins
 import vuetify from './vuetify'
+
+const pinia = createPinia()
 
 export function registerPlugins (app) {
   app

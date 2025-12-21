@@ -1,9 +1,9 @@
 <script setup>
-import { useRouter } from 'vue-router'
+  import { useRouter } from 'vue-router'
 
-// default to frontend
-const router = useRouter()
-router.replace('/products')
+  // default to frontend
+  const router = useRouter()
+  router.replace('/products')
 </script>
 
 <template>

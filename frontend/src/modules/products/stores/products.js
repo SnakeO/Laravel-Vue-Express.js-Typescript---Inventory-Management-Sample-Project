@@ -13,15 +13,15 @@ export const useProductsStore = defineStore('products', {
   }),
 
   actions: {
-    setFilters(filters) {
+    setFilters (filters) {
       this.filters = { ...this.filters, ...filters }
     },
 
-    clearFilters() {
+    clearFilters () {
       this.filters = { name: '', category: '' }
     },
 
-    setSortBy(sortBy) {
+    setSortBy (sortBy) {
       this.sortBy = sortBy
     },
   },

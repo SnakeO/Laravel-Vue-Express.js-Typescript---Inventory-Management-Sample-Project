@@ -14,7 +14,7 @@ export const useAppStore = defineStore('app', {
   }),
 
   actions: {
-    showSuccess(message) {
+    showSuccess (message) {
       this.snackbar = {
         show: true,
         message,
@@ -23,7 +23,7 @@ export const useAppStore = defineStore('app', {
       }
     },
 
-    showError(message) {
+    showError (message) {
       this.snackbar = {
         show: true,
         message,
@@ -32,7 +32,7 @@ export const useAppStore = defineStore('app', {
       }
     },
 
-    hideSnackbar() {
+    hideSnackbar () {
       this.snackbar.show = false
     },
   },
