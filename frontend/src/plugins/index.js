@@ -4,8 +4,10 @@
  * Automatically included in `./src/main.js`
  */
 
+import { createPinia } from 'pinia'
 import router from '@/router'
-import pinia from '@/stores'
+
+const pinia = createPinia()
 // Plugins
 import vuetify from './vuetify'
 
