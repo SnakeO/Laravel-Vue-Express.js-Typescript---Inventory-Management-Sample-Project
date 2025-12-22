@@ -82,7 +82,7 @@ Inventory Manager is a web application for managing products and orders. It demo
 ```bash
 # Clone the repository
 git clone <repository-url>
-cd developer-test-main
+cd path/to/repo
 
 # Start all services
 docker-compose up --build
