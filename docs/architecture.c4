@@ -1,0 +1,56 @@
+// Backend Services Diagram
+// View at: https://likec4.dev/playground/
+
+specification {
+  element container
+  element database
+  element tool
+}
+
+model {
+  container frontend {
+    title "Frontend"
+    technology "Port 3000"
+  }
+
+  container express {
+    title "Express API"
+    technology "Port 3001"
+  }
+
+  container laravel {
+    title "Laravel"
+    technology "Port 8000"
+  }
+
+  database redis {
+    title "Redis"
+    technology "Port 6379"
+  }
+
+  database mysql {
+    title "MySQL"
+    technology "Port 3306"
+  }
+
+  tool phpmyadmin {
+    title "phpMyAdmin"
+    technology "Port 8080"
+  }
+
+  frontend -> express "API requests"
+  express -> redis "Cache read/write"
+  express -> laravel "Proxy to backend"
+  laravel -> mysql "Data persistence"
+  phpmyadmin -> mysql "Database admin"
+
+  // Cache invalidation
+  laravel -> express "POST /webhooks/cache/invalidate"
+}
+
+views {
+  view index {
+    title "Backend Services"
+    include *
+  }
+}
