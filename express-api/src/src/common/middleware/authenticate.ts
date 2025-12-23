@@ -4,7 +4,9 @@
 import type { Response, NextFunction } from 'express'
 import type { AuthenticatedRequest } from '#common/types/auth.js'
 import { verifyAccessToken } from '#common/services/jwt.js'
-import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken'
+import jwt from 'jsonwebtoken'
+
+const { JsonWebTokenError, TokenExpiredError } = jwt
 
 export const authenticate = (
   req: AuthenticatedRequest,

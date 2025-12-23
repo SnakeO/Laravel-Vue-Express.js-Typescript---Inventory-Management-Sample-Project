@@ -8,15 +8,14 @@ import type { AccessTokenPayload, RefreshTokenPayload } from '#common/types/auth
 export const generateAccessToken = (payload: AccessTokenPayload): string => {
   return jwt.sign(payload, authConfig.jwt.accessSecret, {
     expiresIn: authConfig.jwt.accessExpiresIn,
-    subject: String(payload.sub),
   })
 }
 
 export const generateRefreshToken = (payload: RefreshTokenPayload): string => {
-  return jwt.sign(payload, authConfig.jwt.refreshSecret, {
+  const { jti, ...rest } = payload
+  return jwt.sign(rest, authConfig.jwt.refreshSecret, {
     expiresIn: authConfig.jwt.refreshExpiresIn,
-    subject: String(payload.sub),
-    jwtid: payload.jti,
+    jwtid: jti,
   })
 }
 
