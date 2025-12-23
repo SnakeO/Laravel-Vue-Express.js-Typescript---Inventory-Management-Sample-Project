@@ -4,11 +4,15 @@
 import { Router } from 'express'
 import * as controller from './orders.controller.js'
 import { validateRequest } from '#common/middleware/validateRequest.js'
-import { createOrderSchema } from './orders.validation.js'
+import { authenticate } from '#common/middleware/authenticate.js'
+import { createOrderSchema, orderFiltersSchema } from './orders.validation.js'
 
 export const routes = Router()
 
-routes.get('/', controller.list)
+// Public routes
+routes.get('/', validateRequest(orderFiltersSchema, 'query'), controller.list)
 routes.get('/:id', controller.show)
-routes.post('/', validateRequest(createOrderSchema), controller.create)
-routes.delete('/:id', controller.destroy)
+
+// Protected routes
+routes.post('/', authenticate, validateRequest(createOrderSchema), controller.create)
+routes.delete('/:id', authenticate, controller.destroy)

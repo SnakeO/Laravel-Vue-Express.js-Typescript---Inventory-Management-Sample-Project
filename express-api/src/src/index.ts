@@ -5,6 +5,7 @@
 import express, { type Express } from 'express'
 import cors from 'cors'
 import { appConfig } from './config/index.js'
+import { routes as authRoutes } from './modules/auth/index.js'
 import { routes as productRoutes } from './modules/products/index.js'
 import { routes as orderRoutes } from './modules/orders/index.js'
 import { routes as webhookRoutes } from './modules/cache/index.js'
@@ -34,6 +35,7 @@ app.get('/health', (_req, res) => {
 })
 
 // Mount routes
+app.use('/auth', authRoutes)
 app.use('/products', productRoutes)
 app.use('/orders', orderRoutes)
 app.use('/webhooks', webhookRoutes)
