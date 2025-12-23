@@ -1,15 +1,15 @@
-import { jest, describe, it, expect, beforeEach } from '@jest/globals'
+import { vi, describe, it, expect, beforeEach } from 'vitest'
 import type { Request, Response, NextFunction } from 'express'
 
 // Mock Laravel client at boundary
 const mockLaravelClient = {
-  get: jest.fn(),
-  post: jest.fn(),
-  put: jest.fn(),
-  delete: jest.fn(),
+  get: vi.fn(),
+  post: vi.fn(),
+  put: vi.fn(),
+  delete: vi.fn(),
 }
 
-jest.unstable_mockModule('#common/services/laravel.js', () => ({
+vi.mock('#common/services/laravel.js', () => ({
   laravelClient: mockLaravelClient,
 }))
 
@@ -17,9 +17,9 @@ describe('Orders Controller', () => {
   let controller: typeof import('../orders.controller.js')
   let mockReq: Partial<Request>
   let mockRes: {
-    json: ReturnType<typeof jest.fn>
-    status: ReturnType<typeof jest.fn>
-    send: ReturnType<typeof jest.fn>
+    json: ReturnType<typeof vi.fn>
+    status: ReturnType<typeof vi.fn>
+    send: ReturnType<typeof vi.fn>
   }
   let mockNext: NextFunction
 
@@ -32,12 +32,12 @@ describe('Orders Controller', () => {
       body: {},
     }
     mockRes = {
-      json: jest.fn().mockReturnThis(),
-      status: jest.fn().mockReturnThis(),
-      send: jest.fn().mockReturnThis(),
+      json: vi.fn().mockReturnThis(),
+      status: vi.fn().mockReturnThis(),
+      send: vi.fn().mockReturnThis(),
     }
-    mockNext = jest.fn()
-    jest.clearAllMocks()
+    mockNext = vi.fn()
+    vi.clearAllMocks()
   })
 
   describe('list', () => {
@@ -65,6 +65,12 @@ describe('Orders Controller', () => {
               updated_at: '2024-01-15T11:00:00Z',
             },
           ],
+          meta: {
+            current_page: 1,
+            last_page: 1,
+            per_page: 20,
+            total: 1,
+          },
         },
       })
 
@@ -74,7 +80,7 @@ describe('Orders Controller', () => {
         mockNext
       )
 
-      // Assert: nested product.cost is stripped
+      // Assert: nested product.cost is stripped and meta is included
       expect(mockRes.json).toHaveBeenCalledWith({
         data: [
           {
@@ -95,6 +101,12 @@ describe('Orders Controller', () => {
             updated_at: '2024-01-15T11:00:00Z',
           },
         ],
+        meta: {
+          current_page: 1,
+          last_page: 1,
+          per_page: 20,
+          total: 1,
+        },
       })
     })
 

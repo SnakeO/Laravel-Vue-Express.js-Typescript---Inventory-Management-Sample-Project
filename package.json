@@ -1,0 +1,15 @@
+{
+  "name": "developer-test",
+  "version": "1.0.0",
+  "description": "Full-stack inventory management application",
+  "private": true,
+  "scripts": {
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:debug": "playwright test --debug"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.57.0"
+  }
+}

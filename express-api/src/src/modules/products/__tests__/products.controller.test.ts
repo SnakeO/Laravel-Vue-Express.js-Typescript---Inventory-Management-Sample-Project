@@ -1,32 +1,32 @@
-import { jest, describe, it, expect, beforeEach } from '@jest/globals'
+import { vi, describe, it, expect, beforeEach } from 'vitest'
 import type { Request, Response, NextFunction } from 'express'
 
 // Mock Redis at boundary
 const mockRedis = {
-  get: jest.fn(),
-  set: jest.fn(),
-  del: jest.fn(),
-  keys: jest.fn(),
-  on: jest.fn(),
+  get: vi.fn(),
+  set: vi.fn(),
+  del: vi.fn(),
+  keys: vi.fn(),
+  on: vi.fn(),
 }
 
 // Mock Laravel client at boundary
 const mockLaravelClient = {
-  get: jest.fn(),
-  post: jest.fn(),
-  put: jest.fn(),
-  delete: jest.fn(),
+  get: vi.fn(),
+  post: vi.fn(),
+  put: vi.fn(),
+  delete: vi.fn(),
 }
 
-jest.unstable_mockModule('#common/services/redis.js', () => ({
+vi.mock('#common/services/redis.js', () => ({
   redis: mockRedis,
 }))
 
-jest.unstable_mockModule('#common/services/laravel.js', () => ({
+vi.mock('#common/services/laravel.js', () => ({
   laravelClient: mockLaravelClient,
 }))
 
-jest.unstable_mockModule('#config/index.js', () => ({
+vi.mock('#config/index.js', () => ({
   redisConfig: {
     host: 'localhost',
     port: 6379,
@@ -38,9 +38,9 @@ describe('Products Controller', () => {
   let controller: typeof import('../products.controller.js')
   let mockReq: Partial<Request>
   let mockRes: {
-    json: ReturnType<typeof jest.fn>
-    status: ReturnType<typeof jest.fn>
-    send: ReturnType<typeof jest.fn>
+    json: ReturnType<typeof vi.fn>
+    status: ReturnType<typeof vi.fn>
+    send: ReturnType<typeof vi.fn>
   }
   let mockNext: NextFunction
 
@@ -53,12 +53,12 @@ describe('Products Controller', () => {
       body: {},
     }
     mockRes = {
-      json: jest.fn().mockReturnThis(),
-      status: jest.fn().mockReturnThis(),
-      send: jest.fn().mockReturnThis(),
+      json: vi.fn().mockReturnThis(),
+      status: vi.fn().mockReturnThis(),
+      send: vi.fn().mockReturnThis(),
     }
-    mockNext = jest.fn()
-    jest.clearAllMocks()
+    mockNext = vi.fn()
+    vi.clearAllMocks()
   })
 
   describe('list', () => {
@@ -80,6 +80,12 @@ describe('Products Controller', () => {
               updated_at: '2024-01-15T10:30:00Z',
             },
           ],
+          meta: {
+            current_page: 1,
+            last_page: 1,
+            per_page: 20,
+            total: 1,
+          },
         },
       })
 
@@ -89,7 +95,7 @@ describe('Products Controller', () => {
         mockNext
       )
 
-      // Assert: response has no cost (stripCost ran)
+      // Assert: response has no cost (stripCost ran) and includes meta
       expect(mockRes.json).toHaveBeenCalledWith({
         data: [
           {
@@ -103,24 +109,38 @@ describe('Products Controller', () => {
             updated_at: '2024-01-15T10:30:00Z',
           },
         ],
+        meta: {
+          current_page: 1,
+          last_page: 1,
+          per_page: 20,
+          total: 1,
+        },
       })
       expect(mockRedis.set).toHaveBeenCalled()
     })
 
     it('should return cached products on cache hit', async () => {
-      const cachedProducts = [
-        {
-          id: 1,
-          name: 'Widget',
-          description: 'A widget',
-          category: 'Electronics',
-          price: 29.99,
-          quantity: 100,
-          created_at: '2024-01-15T10:30:00Z',
-          updated_at: '2024-01-15T10:30:00Z',
+      const cachedResult = {
+        data: [
+          {
+            id: 1,
+            name: 'Widget',
+            description: 'A widget',
+            category: 'Electronics',
+            price: 29.99,
+            quantity: 100,
+            created_at: '2024-01-15T10:30:00Z',
+            updated_at: '2024-01-15T10:30:00Z',
+          },
+        ],
+        meta: {
+          current_page: 1,
+          last_page: 1,
+          per_page: 20,
+          total: 1,
         },
-      ]
-      mockRedis.get.mockResolvedValue(JSON.stringify(cachedProducts))
+      }
+      mockRedis.get.mockResolvedValue(JSON.stringify(cachedResult))
 
       await controller.list(
         mockReq as Request,
@@ -129,14 +149,17 @@ describe('Products Controller', () => {
       )
 
       expect(mockLaravelClient.get).not.toHaveBeenCalled()
-      expect(mockRes.json).toHaveBeenCalledWith({ data: cachedProducts })
+      expect(mockRes.json).toHaveBeenCalledWith(cachedResult)
     })
 
     it('should pass filters to Laravel API', async () => {
       mockReq.query = { category: 'Electronics', name: 'Widget' }
       mockRedis.get.mockResolvedValue(null)
       mockLaravelClient.get.mockResolvedValue({
-        data: { data: [] },
+        data: {
+          data: [],
+          meta: { current_page: 1, last_page: 1, per_page: 20, total: 0 },
+        },
       })
 
       await controller.list(
@@ -146,7 +169,8 @@ describe('Products Controller', () => {
       )
 
       expect(mockLaravelClient.get).toHaveBeenCalledWith(
-        '/products?category=Electronics&name=Widget'
+        '/products',
+        { params: { category: 'Electronics', name: 'Widget' } }
       )
     })
 

@@ -1,12 +1,12 @@
 /**
  * Tests for webhook authentication middleware
  */
-import { jest, describe, it, expect, beforeEach } from '@jest/globals'
+import { vi, describe, it, expect, beforeEach } from 'vitest'
 import type { Request, Response, NextFunction } from 'express'
 
 const TEST_SECRET = 'test-webhook-secret'
 
-jest.unstable_mockModule('#config/index.js', () => ({
+vi.mock('#config/index.js', () => ({
   webhookConfig: {
     secret: TEST_SECRET,
   },
@@ -16,8 +16,8 @@ describe('webhookAuth middleware', () => {
   let webhookAuth: typeof import('../webhookAuth.js').webhookAuth
   let mockReq: Partial<Request>
   let mockRes: {
-    json: ReturnType<typeof jest.fn>
-    status: ReturnType<typeof jest.fn>
+    json: ReturnType<typeof vi.fn>
+    status: ReturnType<typeof vi.fn>
   }
   let mockNext: NextFunction
 
@@ -29,11 +29,11 @@ describe('webhookAuth middleware', () => {
       headers: {},
     }
     mockRes = {
-      json: jest.fn().mockReturnThis(),
-      status: jest.fn().mockReturnThis(),
+      json: vi.fn().mockReturnThis(),
+      status: vi.fn().mockReturnThis(),
     }
-    mockNext = jest.fn()
-    jest.clearAllMocks()
+    mockNext = vi.fn()
+    vi.clearAllMocks()
   })
 
   it('should call next() when valid secret is provided', () => {

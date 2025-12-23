@@ -1,4 +1,4 @@
-import { describe, it, expect } from '@jest/globals'
+import { describe, it, expect } from 'vitest'
 import { stripCost, stripCostFromList } from '../products.types.js'
 import type { Product } from '../products.types.js'
 

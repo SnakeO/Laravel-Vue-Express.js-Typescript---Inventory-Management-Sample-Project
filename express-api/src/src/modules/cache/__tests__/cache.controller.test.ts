@@ -1,29 +1,29 @@
-import { jest, describe, it, expect, beforeEach } from '@jest/globals'
+import { vi, describe, it, expect, beforeEach } from 'vitest'
 import type { Request, Response, NextFunction } from 'express'
 
 // Mock Redis at boundary
 const mockRedis = {
-  get: jest.fn(),
-  set: jest.fn(),
-  del: jest.fn(),
-  keys: jest.fn(),
-  on: jest.fn(),
+  get: vi.fn(),
+  set: vi.fn(),
+  del: vi.fn(),
+  keys: vi.fn(),
+  on: vi.fn(),
 }
 
-jest.unstable_mockModule('#common/services/redis.js', () => ({
+vi.mock('#common/services/redis.js', () => ({
   redis: mockRedis,
 }))
 
-jest.unstable_mockModule('#common/services/laravel.js', () => ({
+vi.mock('#common/services/laravel.js', () => ({
   laravelClient: {
-    get: jest.fn(),
-    post: jest.fn(),
-    put: jest.fn(),
-    delete: jest.fn(),
+    get: vi.fn(),
+    post: vi.fn(),
+    put: vi.fn(),
+    delete: vi.fn(),
   },
 }))
 
-jest.unstable_mockModule('#config/index.js', () => ({
+vi.mock('#config/index.js', () => ({
   redisConfig: {
     host: 'localhost',
     port: 6379,
@@ -42,8 +42,8 @@ describe('Cache Controller', () => {
   let controller: typeof import('../cache.controller.js')
   let mockReq: Partial<Request>
   let mockRes: {
-    json: ReturnType<typeof jest.fn>
-    status: ReturnType<typeof jest.fn>
+    json: ReturnType<typeof vi.fn>
+    status: ReturnType<typeof vi.fn>
   }
   let mockNext: NextFunction
 
@@ -52,11 +52,11 @@ describe('Cache Controller', () => {
 
     mockReq = {}
     mockRes = {
-      json: jest.fn().mockReturnThis(),
-      status: jest.fn().mockReturnThis(),
+      json: vi.fn().mockReturnThis(),
+      status: vi.fn().mockReturnThis(),
     }
-    mockNext = jest.fn()
-    jest.clearAllMocks()
+    mockNext = vi.fn()
+    vi.clearAllMocks()
   })
 
   describe('invalidateProductCache', () => {

@@ -9,6 +9,9 @@ A full-stack inventory management system with a modern microservices architectur
 ![Redis](https://img.shields.io/badge/Redis-7.0-DC382D?logo=redis&logoColor=white)
 ![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?logo=mysql&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)
+![Vitest](https://img.shields.io/badge/Vitest-4.0-6E9F18?logo=vitest&logoColor=white)
+![Pest](https://img.shields.io/badge/Pest-3.0-8957E5?logo=php&logoColor=white)
+![Playwright](https://img.shields.io/badge/Playwright-1.57-45BA4B?logo=playwright&logoColor=white)
 
 ## Overview
 
@@ -174,12 +177,65 @@ docker-compose up --build
 
 ### Running Tests
 
-```bash
-# Express API tests
-cd express-api/src && npm test
+The project includes comprehensive testing across all layers:
 
-# Laravel tests
-cd laravel-app/src && php artisan test
+| Layer | Framework | Command |
+|-------|-----------|---------|
+| Express API | Vitest + Supertest | `cd express-api/src && npm test` |
+| Laravel | Pest | `docker exec laravel_app php artisan test` |
+| Vue Frontend | Vitest + Vue Test Utils | `cd frontend && npm test` |
+| E2E | Playwright | `npm run test:e2e` |
+
+```bash
+# Express API unit & integration tests
+cd express-api/src && npm test
+cd express-api/src && npm run test:coverage  # with coverage
+
+# Laravel tests (via Docker)
+docker exec laravel_app php artisan test
+docker exec laravel_app php artisan test --coverage  # with coverage
+
+# Vue frontend unit tests
+cd frontend && npm test
+cd frontend && npm run test:coverage  # with coverage
+
+# E2E tests (requires all services running)
+docker-compose up -d
+npm run test:e2e          # headless
+npm run test:e2e:headed   # with browser visible
+npm run test:e2e:ui       # Playwright UI mode
+```
+
+### Test Structure
+
+```
+├── express-api/src/
+│   └── tests/
+│       ├── setup.ts              # Test setup & mocks
+│       ├── unit/                 # Unit tests
+│       │   └── jwt.test.ts
+│       └── integration/          # API integration tests
+│           └── auth.test.ts
+│
+├── laravel-app/src/tests/
+│   ├── Feature/                  # Feature tests
+│   │   ├── AuthTest.php
+│   │   ├── ProductTest.php
+│   │   └── OrderTest.php
+│   └── Unit/                     # Unit tests
+│
+├── frontend/tests/
+│   ├── setup.js                  # Test setup & mocks
+│   └── unit/                     # Composable tests
+│       ├── useAuth.test.js
+│       └── useCrud.test.js
+│
+└── e2e/
+    ├── fixtures/                 # Test fixtures
+    │   └── auth.ts
+    └── tests/                    # E2E specs
+        ├── auth.spec.ts
+        └── products.spec.ts
 ```
 
 ### Environment Variables
