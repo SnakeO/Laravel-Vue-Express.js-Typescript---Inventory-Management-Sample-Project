@@ -111,6 +111,21 @@ docker-compose up --build
 | Username | admin |
 | Password | qwertyui |
 
+### Test User Credentials
+
+Run the seeder to create a test user:
+
+```bash
+docker compose exec laravel php artisan db:seed
+```
+
+| Field | Value |
+|-------|-------|
+| Email | admin@example.com |
+| Password | password123 |
+
+Auth endpoint: `POST /api/v1/auth/validate`
+
 ## Project Structure
 
 ```
